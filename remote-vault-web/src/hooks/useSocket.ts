@@ -34,7 +34,7 @@ export function useSocket() {
         socketInstance.on('connect', () => {
             setIsConnected(true);
             socketInstance.emit('web:handshake', { 
-                userId: session.user.email,
+                userId: session?.user?.email,
                 publicKey: publicKeyStr // Broadcast our public key for pairing
             });
             console.log('Connected to Relay Server (ZK-Handshake Ready)');

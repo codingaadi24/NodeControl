@@ -42,29 +42,13 @@ interface Device {
 export default function DashboardPage() {
   const [devices, setDevices] = useState<Device[]>([]);
   const [loading, setLoading] = useState(true);
-  const [proximityNode, setProximityNode] = useState<any>(null);
-  const [showApprovalModal, setShowApprovalModal] = useState(false);
-  const [approvalPassword, setApprovalPassword] = useState("");
+
   const { deviceStatuses, isConnected, socket } = useSocket();
 
   useEffect(() => {
     fetchDevices();
   }, []);
 
-  useEffect(() => {
-    if (!socket) return;
-    socket.on('discovery:proximity', (data: any) => setProximityNode(data));
-    return () => { socket.off('discovery:proximity'); };
-  }, [socket]);
-
-  const handleApprove = async () => {
-    if (socket && proximityNode) {
-        socket.emit('device:approve', { deviceId: proximityNode.deviceId, passwordHash: approvalPassword });
-        setProximityNode(null);
-        setShowApprovalModal(false);
-        fetchDevices();
-    }
-  };
 
   const fetchDevices = async () => {
     try {
@@ -197,7 +181,7 @@ export default function DashboardPage() {
 
                 <div className="mt-8 pt-8 border-t border-white/5 flex items-center justify-between">
                    <button className="text-xs font-bold text-slate-400 hover:text-white transition-colors flex items-center gap-2">
-                      Access Node <ExternalLink size={14} />
+                      Access Node <ArrowUpRight size={14} />
                    </button>
                    <button className="p-2 hover:bg-white/5 rounded-lg transition-colors text-slate-700 hover:text-slate-300">
                       <MoreVertical size={18} />
@@ -270,80 +254,6 @@ export default function DashboardPage() {
           </div>
       </section>
 
-      {/* Proximity Dialog (Refined) */}
-      <AnimatePresence>
-        {proximityNode && (
-            <motion.div 
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                className="fixed bottom-10 right-10 z-[200] p-8 rounded-3xl bg-[#080b11] border border-blue-500/50 shadow-[0_0_50px_rgba(59,130,246,0.15)] max-w-sm"
-            >
-                <div className="flex items-start gap-6">
-                    <div className="w-14 h-14 rounded-2xl bg-blue-600 flex items-center justify-center shrink-0 border border-blue-400/30">
-                        <Signal size={24} className="text-white" />
-                    </div>
-                    <div>
-                        <h4 className="font-bold text-white text-lg tracking-tight">Nearby Client Found</h4>
-                        <p className="text-xs text-slate-500 mt-2 leading-relaxed">
-                            A device named <span className="text-white font-bold">"{proximityNode.name}"</span> was detected. Establish a secure link?
-                        </p>
-                        <div className="flex gap-3 mt-6">
-                            <button 
-                                onClick={() => setShowApprovalModal(true)}
-                                className="flex-1 py-2.5 bg-blue-600 text-white font-bold text-[11px] uppercase tracking-wider rounded-lg shadow-lg hover:bg-blue-500 transition-all"
-                            >
-                                Connect
-                            </button>
-                            <button 
-                                onClick={() => setProximityNode(null)}
-                                className="flex-1 py-2.5 bg-white/5 border border-white/10 text-[11px] font-bold uppercase tracking-wider rounded-lg hover:bg-white/10 transition-all"
-                            >
-                                Dismiss
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Modal Profile Overlay for Approvals */}
-      <AnimatePresence>
-        {showApprovalModal && (
-            <div className="fixed inset-0 z-[500] flex items-center justify-center p-6 bg-black/60 backdrop-blur-xl">
-                <motion.div 
-                    initial={{ scale: 0.95, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.95, opacity: 0 }}
-                    className="bg-[#080b11] border border-white/10 p-12 rounded-[2.5rem] w-full max-w-md shadow-2xl text-center"
-                >
-                    <div className="w-16 h-16 bg-blue-600/10 border border-blue-500/20 rounded-2xl flex items-center justify-center mx-auto mb-8 text-blue-500">
-                        <Lock size={28} />
-                    </div>
-                    <h2 className="text-2xl font-bold text-white mb-2">Authorize Unit</h2>
-                    <p className="text-slate-500 text-sm mb-10 leading-relaxed">
-                        Authorize unit connection via your master infrastructure password.
-                    </p>
-                    
-                    <input 
-                        type="password"
-                        placeholder="Master Gateway Password"
-                        value={approvalPassword}
-                        onChange={(e) => setApprovalPassword(e.target.value)}
-                        className="w-full bg-white/[0.03] border border-white/10 px-6 py-5 rounded-xl text-center text-lg focus:border-blue-500 outline-none transition-all mb-8 text-white font-mono"
-                    />
-
-                    <button 
-                        onClick={handleApprove}
-                        className="w-full py-4 bg-blue-600 text-white font-bold uppercase tracking-widest text-xs rounded-xl shadow-xl shadow-blue-600/20 active:scale-95"
-                    >
-                        Verify & Establish Link
-                    </button>
-                </motion.div>
-            </div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

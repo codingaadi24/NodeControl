@@ -49,6 +49,8 @@ model Device {
   type            String   // PC, MOBILE, LAPTOP, SERVER
   os              String?  // Windows, Android, iOS, Linux
   status          String   @default("OFFLINE") // ONLINE, OFFLINE
+  isApproved      Boolean  @default(false)     // Quarantine check
+  hardwareHash    String?  @unique             // The "Identity DNA"
   lastSeen        DateTime @default(now())
   capabilities    Json?    // Store permissions: { "files": true, "otp": true, etc }
   provisioningKey String   @unique @default(uuid())

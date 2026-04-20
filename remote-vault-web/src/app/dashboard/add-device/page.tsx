@@ -223,6 +223,20 @@ export default function OnboardingPage() {
                            <p className="text-xs text-slate-400 font-bold tracking-wide mt-4">
                              Scan with RemoteVault Mobile App to pair.
                            </p>
+
+                           {/* Permissions Disclaimer */}
+                           <div className="mt-8 p-6 bg-amber-500/10 border border-amber-500/20 rounded-xl text-left flex items-start gap-4 max-w-lg mx-auto">
+                             <ShieldAlert className="text-amber-500 mt-1 shrink-0" size={24} />
+                             <div>
+                               <h5 className="text-amber-500 font-bold text-xs tracking-wider uppercase mb-2">Required OS Permissions</h5>
+                               <ul className="text-slate-400 text-[10px] leading-relaxed space-y-1 list-disc list-inside">
+                                 <li><strong>Screen Recording (MediaProjection)</strong> for viewing.</li>
+                                 <li><strong>Accessibility Service</strong> for remote cursor/touch control.</li>
+                                 <li><strong>Full File Access</strong> to route files through the mesh.</li>
+                                 <li><strong>Battery Optimization Exclusion</strong> to maintain unattended connection.</li>
+                               </ul>
+                             </div>
+                           </div>
                         </div>
                       ) : (
                         <div className="space-y-4 text-left">

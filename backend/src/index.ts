@@ -20,6 +20,10 @@ const start = async () => {
             origin: true, // Allow all origins for development
         });
 
+        app.get('/health', async () => {
+            return { status: 'ok' };
+        });
+
         await app.listen({ port: Number(process.env.PORT) || 3001, host: '0.0.0.0' });
         
         const io = new Server(app.server, {
@@ -45,18 +49,15 @@ const start = async () => {
                         return;
                     }
 
-                    // Security: Quarantine Check (Basis for trust)
-                    if (!device.isApproved && device.hardwareHash && device.hardwareHash !== data.hardwareHash) {
-                        socket.emit('status:quarantine', { message: 'Device pending manual approval' });
-                    }
-
-                    // Update device status to ONLINE
+                    // Unattended Access Auto-Approval
+                    // Once a device connects securely with a valid provisioningKey, it is permanently trusted (AnyDesk style unattended access)
                     await prisma.device.update({
                         where: { id: device.id },
                         data: { 
                             status: 'ONLINE', 
+                            isApproved: true, // Permanent Unattended Access Granted
                             lastSeen: new Date(),
-                            hardwareHash: device.hardwareHash || data.hardwareHash // Bind Hardware DNA (IMEI)
+                            hardwareHash: device.hardwareHash || data.hardwareHash || null // Bind Hardware DNA (IMEI)
                         }
                     });
 
@@ -69,24 +70,17 @@ const start = async () => {
                     socket.emit('handshake:success', { 
                         deviceName: device.name,
                         ownerName: device.owner.name,
-                        isApproved: device.isApproved 
+                        isApproved: true 
                     });
 
                     // Notify web console that device is online
                     io.to(`user:${device.ownerId}`).emit('device:status', { 
                         deviceId: device.id, 
                         status: 'ONLINE',
-                        isApproved: device.isApproved
+                        isApproved: true
                     });
 
-                    // Automatic Mesh Discovery (Proximity Alert)
-                    const publicIp = socket.handshake.address;
-                    socket.to(`user:${device.ownerId}`).emit('discovery:proximity', {
-                        deviceId: device.id,
-                        type: device.type,
-                        name: device.name,
-                        ip: publicIp
-                    });
+                    // Proximity manual approval popups have been disabled for unattended access.
 
                 } catch (error) {
                     console.error('Handshake error:', error);

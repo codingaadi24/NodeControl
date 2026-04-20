@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
+import { SiteNavigation } from "@/components/SiteNavigation";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,6 +21,7 @@ export default function RootLayout({
       <body suppressHydrationWarning>
         <Providers>
           <div className={`${inter.className} antialiased min-h-screen`}>
+            <SiteNavigation />
             {children}
           </div>
         </Providers>
