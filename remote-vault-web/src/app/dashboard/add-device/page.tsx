@@ -28,6 +28,8 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useSocket } from "@/hooks/useSocket";
+import { QRCodeSVG } from "qrcode.react";
+
 
 const PROVISIONING_TYPES = [
   { id: 'DESKTOP', title: 'Workstation / PC', icon: Laptop, desc: 'Enterprise desktop agents for Windows, MacOS, or Linux.' },
@@ -215,17 +217,33 @@ export default function OnboardingPage() {
                   
                   <div className="p-10 rounded-[2rem] bg-black/40 border border-white/5 space-y-10 shadow-2xl">
                       {selectedType === 'MOBILE' ? (
-                        <div className="space-y-4 text-center pb-4">
-                           <div className="mx-auto w-48 h-48 bg-white p-4 rounded-xl flex items-center justify-center">
-                              {/* True QR Code library will replace this icon */}
-                              <QrCode size={160} className="text-slate-900" />
+                        <div className="space-y-6 text-center pb-4 items-center flex flex-col">
+                           <div className="mx-auto bg-white p-6 rounded-3xl flex items-center justify-center shadow-2xl shadow-blue-500/10">
+                              <QRCodeSVG 
+                                value={provisioningKey} 
+                                size={220}
+                                level="L"
+                                includeMargin={true}
+                                bgColor="#ffffff"
+                                fgColor="#000000"
+                              />
                            </div>
-                           <p className="text-xs text-slate-400 font-bold tracking-wide mt-4">
-                             Scan with RemoteVault Mobile App to pair.
-                           </p>
+                           
+                           <div className="space-y-4 w-full max-w-xs">
+                              <p className="text-[10px] text-slate-400 font-bold tracking-[0.2em] uppercase">
+                                Alternative: Magic Link
+                              </p>
+                              <a 
+                                href={`remotevault://login?key=${provisioningKey}`}
+                                className="flex items-center justify-center gap-3 w-full py-4 bg-white/5 border border-white/10 rounded-2xl text-white font-bold text-xs hover:bg-white/10 transition-all active:scale-95"
+                              >
+                                <Smartphone size={16} className="text-blue-500" />
+                                Open in RemoteVault App
+                              </a>
+                           </div>
 
                            {/* Permissions Disclaimer */}
-                           <div className="mt-8 p-6 bg-amber-500/10 border border-amber-500/20 rounded-xl text-left flex items-start gap-4 max-w-lg mx-auto">
+                           <div className="mt-8 p-6 bg-blue-500/5 border border-blue-500/10 rounded-2xl text-left flex items-start gap-4 max-w-lg mx-auto">
                              <ShieldAlert className="text-amber-500 mt-1 shrink-0" size={24} />
                              <div>
                                <h5 className="text-amber-500 font-bold text-xs tracking-wider uppercase mb-2">Required OS Permissions</h5>
